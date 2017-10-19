@@ -15,7 +15,7 @@ LANDMARK_SIZE = 68
 LANDMARK_PREDICTOR = './landmark-68.dat'
 
 # Focal Point
-FOCAL_POINT = [WIDTH/2,HEIGHT/2]
+FOCAL_POINT = [int(WIDTH/2),int(HEIGHT/2)]
 FOCAL_POINT = np.array(FOCAL_POINT)
 
 # NEURAL NETWORK
@@ -416,5 +416,3 @@ TARGET = [[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -
 	   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,\
 	   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,\
 	   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]]
-
-

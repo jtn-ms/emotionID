@@ -11,18 +11,18 @@ import math
 def arr2vec(arr,filename = None):
     size = 1
     for i in range(len(arr.shape)):
-	size *= arr.shape[i]  	
+        size *= arr.shape[i]
     vec = arr.reshape((size,))
     if  filename is not None:
-	arr.tofile(filename + '.vec')	
+        arr.tofile(filename + '.vec')	
     return vec
 
 #draw line
 def drawLine(img,shape,here,there,isClosed=False,linewidth=2):
     for i in range(here,there):
-    	cv2.line(img,(shape[i][0],shape[i][1]),(shape[i + 1][0],shape[i + 1][1]),255,linewidth)		
+        cv2.line(img,(shape[i][0],shape[i][1]),(shape[i + 1][0],shape[i + 1][1]),255,linewidth)		
     if  isClosed:
-     	cv2.line(img,(shape[here][0],shape[here][1]),(shape[there][0],shape[there][1]),255,linewidth)
+        cv2.line(img,(shape[here][0],shape[here][1]),(shape[there][0],shape[there][1]),255,linewidth)
 
 #draw contour
 def drawContours(img,coords,linewidth=2):
@@ -42,8 +42,8 @@ def drawContours(img,coords,linewidth=2):
 def arr2img(arr, filename = None):
     #data is 1 or -1 matrix
     if  len(arr.shape) == 1:
-	dim = int(math.sqrt(len(arr)))
-	arr = arr.reshape((dim,dim))
+        dim = int(math.sqrt(len(arr)))
+        arr = arr.reshape((dim,dim))
     img = np.zeros(arr.shape, np.uint8)
     img[arr==1] = 255
     img[arr==-1] = 0
@@ -53,12 +53,12 @@ def arr2img(arr, filename = None):
 
 #Image to Array
 def img2arr(img, filename = None):
-    #
     arr = np.ones((img.shape),np.int)
     arr[:] = -1
     arr[img > 128] = 1
     if  filename is not None:
-	arr.tofile(filename + '.dat')
+        fullname = filename + '.dat'
+        arr.tofile(fullname)
     return arr
 
 #facial landmarks to feature space(array)
@@ -84,9 +84,9 @@ def fpoints2array(points, filename = None, newdim = cfg.DIM):
     img = np.zeros((newdim, newdim), np.uint8)
     drawContours(img,points) 
     if  filename is not None:
-    	cv2.imwrite(filename + '.png',img)
-	cv2.imshow('test',img)
-	cv2.waitKey(1)
+        cv2.imwrite(filename + '.png',img)
+        cv2.imshow('test',img)
+        cv2.waitKey(1)
     # IMG2ARR
     arr = img2arr(img,filename) 
 
@@ -113,7 +113,7 @@ def pts2arr(points,newdim):
     arr = np.ones((newdim,newdim),np.int)
     arr[:] = -1
     for (x,y) in points:
-	arr[x][y] = 1
+        arr[x][y] = 1
     	
     return arr
 #dis betwen point1 and point2
@@ -142,23 +142,23 @@ def arr2int(arr):
     result = 0
     for i in range(len(arr)):
         if arr[len(arr) - i - 1] == 1:
-	   return (len(arr) - i)
+            return (len(arr) - i)
     return result
 
 #
 def sumup(arr):
     count = 0
     for item in arr:
-	if item == 1:
-	   count+=1
+        if item == 1:
+            count+=1
     return count
 
 #
 def ip_arr(arr,dim):
-    shape =  arr.reshape((dim,len(arr)/dim))	
+    shape =  arr.reshape((dim,int(len(arr)/dim)))	
     out = np.zeros((dim,),np.int)
     for i in range(len(out)):
-	out[i] = arr2int(shape[i])
+        out[i] = arr2int(shape[i])
     
     return out
 
@@ -168,8 +168,8 @@ def ip_1darr(arr,dim):
     shape =  arr.reshape((dim,len(arr)/dim))	
     out = np.zeros((dim,),np.int)
     for i in range(len(out)):
-	print shape[i]
-	out[i] = bytes2int(shape[i])
+        print(shape[i])
+        out[i] = bytes2int(shape[i])
     
     return out
 
@@ -177,15 +177,15 @@ def ip_1darr(arr,dim):
 def ip_2darr(arr,dim):
     outs = np.zeros((arr.shape[0],dim),np.int)
     for i in range(arr.shape[0]):
-	out = ip_1darr(arr[i],dim)
-	outs[i,:] = out[:]
+        out = ip_1darr(arr[i],dim)
+        outs[i,:] = out[:]
     return outs
 #
 def ip_2darr_(arr,dim):
     outs = np.zeros((arr.shape[0],dim),np.int)
     for i in range(arr.shape[0]):
-	out = ip_arr(arr[i],dim)
-	outs[i,:] = out[:]
+        out = ip_arr(arr[i],dim)
+        outs[i,:] = out[:]
     return outs
 #facial landmarks to 
 def fpoints2feature(points, filename = None):
@@ -267,19 +267,13 @@ def fpoints2feature(points, filename = None):
     arr[:] = -1
     for i in range(len(features)):
         index =	int((features[i] / float(face_w + face_h)) * cfg.FEATURE_SIZE)
-	if index >= cfg.FEATURE_SIZE:
-	   index = (cfg.FEATURE_SIZE  - 1)
-	arr[i][index] = 1
-	#lower = index - 10
- 	#upper = index + 10
-	#if lower < 0:
-	#   lower = 0
-        #if upper > cfg.FEATURE_SIZE:
-	#   upper = cfg.FEATURE_SIZE
-        #for j in range(lower,upper) :
-	#    arr[i][j] = 1
+        if index >= cfg.FEATURE_SIZE:
+            index = (cfg.FEATURE_SIZE  - 1)
+        arr[i][index] = 1
+
     if  filename is not None:
-	arr.tofile(filename + '.dat')
+        fullname = filename + '.dat'
+        arr.tofile(fullname)
     #arr2Img
     img =  arr2img(arr)		
     return img,arr
@@ -310,22 +304,21 @@ def arr2pts(arr):
     ys = []
     count = 0
     if  len(arr.shape) == 1:
-	dim = int(math.sqrt(len(arr)))
-	arr = arr.reshape((dim,dim))
+        dim = int(math.sqrt(len(arr)))
+    arr = arr.reshape((dim,dim))
     for i in range(arr.shape[0]):
-	for j in range(arr.shape[1]):
-	    if  arr[i][j] == 1:
-		xs.append(i)		
-		ys.append(j)
-		count += 1
+        for j in range(arr.shape[1]):
+            if  arr[i][j] == 1:
+                xs.append(i)		
+                ys.append(j)
+                count += 1
     pts = np.zeros((count,2),np.int)
     for i in range(count):
-	pts[i][0] = xs[i]
-	pts[i][1] = ys[i]
+        pts[i][0] = xs[i]
+        pts[i][1] = ys[i]
     return pts	
 	
 #resize
 def resizeDim(arr,newdim = 50,filename = None):
     pts = arr2pts(arr)
     return pts2arr(pts,newdim)
-

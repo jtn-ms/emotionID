@@ -27,7 +27,7 @@ cv2.waitKey(10000)
 #print utl.int2bytes(10,10)
 
 #img-->
-def testReal():
+def testReal(): 
     tgt_path = './train/'
     test_cls_name = 'T'
     trandir = tgt_path + test_cls_name + '/'
@@ -58,7 +58,7 @@ def testReal():
     	cv2.imshow('out' + str(i),out)
     cv2.waitKey(100000)
     final = n2.getresult(refined)
-    print final
+    print(final)
 
 def checkSamples(testdir):
     filecount = 0
@@ -101,8 +101,8 @@ def testHop():
     signals = np.array(cfg.tarGET)
     net = nl.net.newhop(signals)   
     refined = net.sim(signals)
-    print signals
-    print refined
+    print(signals)
+    print(refined)
     for i in range(signals.shape[0]):
         inp = cv2.resize(utl.arr2img(signals[i].reshape((7,20))),(200,200))
         out = cv2.resize(utl.arr2img(refined[i].reshape((7,20))),(200,200))
@@ -174,24 +174,20 @@ def testFFNN(trandir,testdir):
     signals = np.zeros((filecount,cfg.INPUT_SIZE),np.int)
     index = 0
     for filename in os.listdir(testdir):
-        print filename
+        print(filename)
         signal = np.fromfile(testdir + filename, dtype=np.int)       
         signal = signal.reshape((cfg.INPUT_SIZE,))
         signals[index,:] = signal[:]
         img = cv2.resize(utl.arr2img(signals[index].reshape((cfg.DIM,cfg.FEATURE_SIZE))),(200,200))
         cv2.imshow(filename,img)
         index += 1
-    #print signals
-    result = net.getresult(signals)
-    print result
-    for i in range(result.shape[0]):
-        print(cfg.CLASS_NAME[result[i][0]])        
-
+    #print signals     
+    print(net.getresult(signals))
+    cv2.imshow('test', np.zeros((100,100),np.uint8))
     cv2.waitKey(100000)  
     
 utl.makeSample()
-testFFNN('./train/T/','./train/Neutral/')
+testFFNN('./train/T/','./train/Positive/')
 #checkSamples('./train/T/')
 #testHop()
 #testHemming()
-

@@ -58,7 +58,7 @@ class FFNN(object):
         inps = np.empty((self.cls_cnt,self.input_dim))
         index = 0
         for filename in cfg.CLASS_NAME:#os.listdir(self.traindir):
-            print self.traindir+filename
+            print(self.traindir+filename)
             x=np.fromfile(self.traindir+filename+cfg.FILE_EXTENSION,dtype=np.int)
             # if size changed
             #if  len(inp) != self.input_dim:
@@ -94,12 +94,12 @@ class FFNN(object):
             inps,outs = self.setTrainData4FromConfig()
 
         # initialize net
-        print 'ffnn: being initialized..'
+        print('ffnn: being initialized..')
         net = self.initializeNet(inps)
         # train net
-        print 'ffnn: training starts...'
+        print('ffnn: training starts...')
         error = net.train(inps, outs, epochs=500000, show=100, goal=0.00001)
-        print 'ffnn: training finished...'
+        print('ffnn: training finished...')
         return net
 	
     #test
@@ -122,7 +122,7 @@ class FFNN(object):
             for j in range(self.cls_cnt):
                 dis[i][j] = abs(actual[j] - predict[i])
 	
-        result = np.zeros((predict.shape[0],1),np.int)
+        result = np.zeros((predict.shape[0],1))
 
         for i in range(predict.shape[0]):
             for j in range(self.cls_cnt):	
@@ -133,12 +133,12 @@ class FFNN(object):
 
     #load
     def loadnet(self,filename):
-        print 'loading ffnn from',filename
+        print('loading ffnn from')#,filename
         return nl.load(filename)
 
     #save
     def savenet(self,filename):
-        print 'saving ffnn'
+        print('saving ffnn')
         self.net.save(filename)
 
 '''
