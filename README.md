@@ -65,3 +65,9 @@
 3. Test
         
         $python test.py
+        
+# License
+ 
+  THE CODE IS NOT ALLOWED FOR COMMERCIAL PURPOSE. PLEASE CONTACT THE AUTHOR FIRST BEFORE YOU USE IT COMMERCIALLY.
+ 
+# Thanks
