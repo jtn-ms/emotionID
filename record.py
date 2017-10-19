@@ -1,5 +1,5 @@
 #import Tkinter as tk
-import os
+import os,sys
    
 try:#if python2
     from Tkinter import *
@@ -98,7 +98,8 @@ class FullScreenApp(object):
      master.geometry("{0}x{1}+0+0".format(master.winfo_screenwidth()-pad, master.winfo_screenheight()-pad))
      master.bind('<Escape>',self.toggle_geom)
      master.wm_protocol("WM_DELETE_WINDOW", self.on_closing)
-     master.bind('<Escape>', lambda e: master.quit())
+     #master.bind('<Escape>', lambda e: master.quit())
+     master.bind('<Escape>', self.on_close)
      master.bind('t',self.T_Pressed)
      master.bind('f',self.F_Pressed)
      master.bind("1",self.One_Pressed)#<BUTTON-1>-MOUSE LEFT BUTTON
@@ -130,7 +131,7 @@ class FullScreenApp(object):
      #state info or temp
      self.Img = np.zeros((height,width,3), np.uint8)
      self.cameraoffline = True
-     self.shape = np.zeros((cfg.LANDMARK_SIZE,2),np.int)
+     self.featurepoints = np.zeros((cfg.LANDMARK_SIZE,2),np.int)
      self.Stages = ['Preparing','Training','Testing']
      self.Sessions = ['Neutral','Positive','Negative']
      self.SessionStarted = False
@@ -143,7 +144,10 @@ class FullScreenApp(object):
      self.stopWatch = StopWatch()
      #make dirs
      self.createOutDirs()
-
+     
+     #
+     self.closing = False
+     
      #show input frame
      self.lview = Label(self.master)
      self.lview.pack(side=LEFT)
@@ -151,7 +155,8 @@ class FullScreenApp(object):
      #show output frame
      self.rview = Label(self.master)
      self.rview.pack(side=RIGHT)
-     self.show_outputframe()     
+     self.show_outputframe()
+     
      #######################################################################################
     #########################################################################################
      #######################################################################################
@@ -220,7 +225,7 @@ class FullScreenApp(object):
         self.stopWatch.doStop()
         #cv2.imwrite('./train/' + self.Sessions[self.currentSessionID] + '/' + \
         #			str(self.currentQuestionID) + '_' + self.stopWatch.doReport() +'.png',self.Img)
-        utl.fpoints2feature(self.shape,'./train/' + self.Sessions[self.currentSessionID] + '/' +str(self.currentQuestionID))
+        utl.fpoints2feature(self.featurepoints,'./train/' + self.Sessions[self.currentSessionID] + '/' +str(self.currentQuestionID))
         self.snapshotID += 1
         print('True')
         # change question,instruction
@@ -259,7 +264,7 @@ class FullScreenApp(object):
         self.stopWatch.doStop()
         #cv2.imwrite('./train/' + self.Sessions[self.currentSessionID] + '/' + \
         #			str(self.currentQuestionID) + '_' + self.stopWatch.doReport() +'.png',self.Img)
-        utl.fpoints2feature(self.shape,'./train/' + self.Sessions[self.currentSessionID] + '/' +str(self.currentQuestionID))	
+        utl.fpoints2feature(self.featurepoints,'./train/' + self.Sessions[self.currentSessionID] + '/' +str(self.currentQuestionID))	
         self.snapshotID += 1
         print('I REMEMBER')
         # change question,instruction
@@ -290,9 +295,9 @@ class FullScreenApp(object):
     ###########################FRAME HANDLE##############################################
      ###################################################################################
     def show_outputframe(self):
-        if self.cameraoffline or np.all(self.shape == 0):
+        if self.cameraoffline or np.all(self.featurepoints == 0):
             return
-        gray,arr = utl.fpoints2feature(self.shape)
+        gray,arr = utl.fpoints2feature(self.featurepoints)
         tmp = cv2.resize(gray, (width,height))
         cv2image = cv2.cvtColor(tmp, cv2.COLOR_GRAY2RGBA)
         img = Image.fromarray(cv2image)
@@ -302,6 +307,9 @@ class FullScreenApp(object):
         self.rview.after(10, self.show_outputframe)
 	        
     def show_inputframe(self):
+        if self.closing:
+            self.cameraoffline = True
+            return
         online, frame = cap.read()
         if online == False:
             self.cameraoffline = True
@@ -399,7 +407,7 @@ class FullScreenApp(object):
             # array
             shape = predictor(gray, rect)
             shape = face_utils.shape_to_np(shape)
-            self.shape = shape
+            self.featurepoints = shape
             (x_, y_, w_, h_) = face_utils.rect_to_bb(rect)
             #x, y, w, h = int(x_ * x_ratio), int(y_ * y_ratio), int(w_ * x_ratio), int(h_ * y_ratio)
             #cv2.rectangle(img, (x, y), (x + w, y + h), (128, 128, 0), 2)
@@ -424,6 +432,7 @@ class FullScreenApp(object):
 
 
     def on_closing(self):
+        self.closing = True
         print('close clicked')
         if py_ver == 3:
             if messagebox.askokcancel("Quit", "Do you want to quit?"):
@@ -431,8 +440,14 @@ class FullScreenApp(object):
         else:
             if tkMessageBox.askokcancel("Quit", "Do you want to quit?"):
                 self.master.destroy()
+    
+    def on_close(self,event):
+        self.closing = True
+        print('escape clicked')
+        self.master.withdraw() # if you want to bring it back
+        sys.exit() # if you want to exit the entire thing        
 
 if __name__ == '__main__':
-    root = Tk()
+    root = Tk()#Toplevel()
     app = FullScreenApp(root)
     root.mainloop()
