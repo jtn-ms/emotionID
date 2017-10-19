@@ -1,16 +1,18 @@
 #import Tkinter as tk
 import os
-
+   
 try:#if python2
     from Tkinter import *
-    import Tkinter	
+    #import Tkinter	
     import tkMessageBox
     print('current python version is 2')
+    py_ver = 2
 except ImportError:#else python3
     from tkinter import *
-    import tkinter
+    #import tkinter
     from tkinter import messagebox
     print('current python version is 3')
+    py_ver = 3
 
 import numpy as np
 import cv2
@@ -31,27 +33,39 @@ from random import randint
 
 import util as utl
 
+(cv_major_ver, cv_minor_ver, cv_subminor_ver) = (cv2.__version__).split('.')
+
 #webcam + save video parameter
 global cap
-cap = cv2.VideoCapture(0)
 global width,height
-width, height = cfg.WIDTH, cfg.HEIGHT
-global fps
-fps=20
-#global fourcc
-#fourcc = cv2.cv.CV_FOURCC('D','I','V','X')
-#global writer
-#writer = cv2.VideoWriter('record.AVI',	fourcc, fps, (width,height), 1)
-
-#cascade
 global face_cascade
-face_cascade = cv2.CascadeClassifier(cfg.FACE_CASCADE_XML)
-
-#dlib landmark
 global detector
-detector = dlib.get_frontal_face_detector()
 global predictor
+
+#
+cap = cv2.VideoCapture(0)
+#
+width, height = cfg.WIDTH, cfg.HEIGHT
+fps=20
+#cascade
+face_cascade = cv2.CascadeClassifier(cfg.FACE_CASCADE_XML)
+#dlib landmark
+detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(cfg.LANDMARK_PREDICTOR)
+
+'''
+global fps
+global fourcc
+global writer
+
+if int(major_ver) < 3 :
+    fourcc = cv2.cv.CV_FOURCC('D','I','V','X')
+    writer = cv2.VideoWriter('record.AVI',	fourcc, fps, (width,height), 1)
+else:
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    writer = cv2.VideoWriter('record.AVI',	fourcc, fps, (width,height), True)
+'''
+
 
 class StopWatch(object):
     def __init__(self):	
@@ -411,8 +425,12 @@ class FullScreenApp(object):
 
     def on_closing(self):
         print('close clicked')
-        if  messagebox.askokcancel("Quit", "Do you want to quit?"):
-            self.master.destroy()
+        if py_ver == 3:
+            if messagebox.askokcancel("Quit", "Do you want to quit?"):
+                self.master.destroy()
+        else:
+            if tkMessageBox.askokcancel("Quit", "Do you want to quit?"):
+                self.master.destroy()
 
 if __name__ == '__main__':
     root = Tk()
