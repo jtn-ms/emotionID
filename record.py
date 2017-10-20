@@ -151,7 +151,8 @@ class FullScreenApp(object):
      #show input frame
      self.lview = Label(self.master)
      self.lview.pack(side=LEFT)
-     self.show_inputframe()
+     while(self.show_inputframe()):
+         continue     
      #show output frame
      self.rview = Label(self.master)
      self.rview.pack(side=RIGHT)
@@ -309,11 +310,11 @@ class FullScreenApp(object):
     def show_inputframe(self):
         if self.closing:
             self.cameraoffline = True
-            return
+            return True
         online, frame = cap.read()
         if online == False:
             self.cameraoffline = True
-            return
+            return True
         self.cameraoffline = False
         frame = cv2.flip(frame, 1)
         frame = cv2.resize(frame, (width,height))
@@ -333,6 +334,8 @@ class FullScreenApp(object):
         self.lview.imgtk = imgtk
         self.lview.configure(image=imgtk)
         self.lview.after(10, self.show_inputframe)
+        
+        return False
 
     def ready4Training(self,img,shape,faceindex,x,y):
         allowed = 12	
@@ -441,13 +444,22 @@ class FullScreenApp(object):
             if tkMessageBox.askokcancel("Quit", "Do you want to quit?"):
                 self.master.destroy()
     
+    def destroy(self):
+        self.master.destroy()
+        #self.master.withdraw() # if you want to bring it back
+        #sys.exit() # if you want to exit the entire thing  
+        
     def on_close(self,event):
         self.closing = True
         print('escape clicked')
-        self.master.withdraw() # if you want to bring it back
-        sys.exit() # if you want to exit the entire thing        
+        if py_ver == 3:
+            if messagebox.askokcancel("Quit", "Do you want to quit?"):
+                self.destroy()
+        else:
+            if tkMessageBox.askokcancel("Quit", "Do you want to quit?"):
+                self.destroy()     
 
 if __name__ == '__main__':
-    root = Tk()#Toplevel()
+    root = Tk()
     app = FullScreenApp(root)
     root.mainloop()
